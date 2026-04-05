@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#16213e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Sudoku</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>SUDOKU</h1>
+    <div class="header-controls">
+      <span id="timer">00:00</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+    <button id="btn-new">New Game</button>
+  </div>
+
+  <div class="board-container">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="controls">
+    <div class="actions">
+      <button id="btn-undo"><span class="icon">↩</span>Undo</button>
+      <button id="btn-erase"><span class="icon">⌫</span>Erase</button>
+      <button id="btn-notes"><span class="icon">✏</span>Notes</button>
+      <button id="btn-hint"><span class="icon">💡</span>Hint</button>
+    </div>
+    <div class="numpad">
+      <button data-num="1">1</button>
+      <button data-num="2">2</button>
+      <button data-num="3">3</button>
+      <button data-num="4">4</button>
+      <button data-num="5">5</button>
+      <button data-num="6">6</button>
+      <button data-num="7">7</button>
+      <button data-num="8">8</button>
+      <button data-num="9">9</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h2>🎉 You Win!</h2>
+      <p>Difficulty: <strong id="modal-difficulty"></strong></p>
+      <p>Time: <strong id="modal-time"></strong></p>
+      <button id="btn-play-again">Play Again</button>
+    </div>
+  </div>
+
+  <script src="js/sudoku.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
