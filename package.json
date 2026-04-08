@@ -1,0 +1,44 @@
+{
+  "name": "sudoku-game",
+  "version": "1.0.0",
+  "description": "Cross-platform Sudoku puzzle game",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win --publish never",
+    "build:mac": "electron-builder --mac --publish never"
+  },
+  "build": {
+    "appId": "com.pisaev.sudoku",
+    "productName": "Sudoku",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "css/**/*",
+      "js/**/*",
+      "icons/**/*",
+      "electron/**/*",
+      "manifest.json"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "icons/icon-512.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icons/icon-512.png",
+      "identity": null
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}

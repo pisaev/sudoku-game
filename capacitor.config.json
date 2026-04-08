@@ -1,0 +1,8 @@
+{
+  "appId": "com.pisaev.sudoku",
+  "appName": "Sudoku",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,82 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build:win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: dist/*.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build:mac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: dist/*.dmg
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+      - run: npm ci
+      - name: Prepare web assets
+        run: |
+          mkdir -p www
+          cp index.html manifest.json www/
+          cp -r css js icons www/
+      - name: Add Android platform
+        run: npx cap add android
+      - name: Sync web assets
+        run: npx cap sync android
+      - name: Build APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: android/app/build/outputs/apk/debug/*.apk
+
+  release:
+    needs: [build-windows, build-macos, build-android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - name: List artifacts
+        run: find . -type f -name '*.exe' -o -name '*.dmg' -o -name '*.apk'
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Sudoku v1.0.${{ github.run_number }}
+          files: |
+            windows-build/*
+            macos-build/*
+            android-build/*
+          generate_release_notes: true
