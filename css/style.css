@@ -485,6 +485,25 @@ header h1 {
   width: 92%;
   max-height: 85vh;
   overflow-y: auto;
+  position: relative;
+}
+
+.tutorial-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.tutorial-close-btn:hover {
+  opacity: 1;
 }
 
 .tutorial-step h2 {
@@ -497,7 +516,7 @@ header h1 {
   font-size: 0.9rem;
   line-height: 1.6;
   margin-bottom: 10px;
-  color: #ccc;
+  color: var(--text-primary);
 }
 
 .tutorial-step .mini-grid {

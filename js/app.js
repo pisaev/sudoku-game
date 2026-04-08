@@ -407,6 +407,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('btn-tutorial').addEventListener('click', showTutorial);
+  document.getElementById('tutorial-close').addEventListener('click', () => {
+    tutorialOverlay.classList.remove('visible');
+  });
   document.getElementById('tutorial-prev').addEventListener('click', () => {
     if (tutorialStep > 0) { tutorialStep--; renderTutorialStep(); }
   });
