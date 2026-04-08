@@ -38,6 +38,11 @@
       <button id="btn-notes"><span class="icon">✏</span>Notes</button>
       <button id="btn-hint"><span class="icon">💡</span>Hint</button>
     </div>
+    <div class="hint-banner" id="hint-banner">
+      <span id="hint-text"></span>
+      <button id="hint-apply">Apply</button>
+      <button id="hint-dismiss">✕</button>
+    </div>
     <div class="numpad">
       <button data-num="1">1</button>
       <button data-num="2">2</button>
@@ -61,6 +66,7 @@
   </div>
 
   <script src="js/sudoku.js"></script>
+  <script src="js/solver-techniques.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

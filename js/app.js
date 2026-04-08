@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selected = -1;
     noteMode = false;
     history = [];
+    activeHint = null;
     gameComplete = false;
     timerSeconds = 0;
     clearInterval(timerInterval);
@@ -70,7 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.appendChild(notesDiv);
       }
 
-      if (i === selected) {
+      if (activeHint && i === activeHint.index) {
+        cell.classList.add('hint-target');
+      } else if (activeHint && activeHint.highlights && activeHint.highlights.includes(i)) {
+        cell.classList.add('hint-highlight');
+      } else if (i === selected) {
         cell.classList.add('selected');
       } else if (selected >= 0) {
         const sr = Sudoku.getRow(selected), sc = Sudoku.getCol(selected), sb = Sudoku.getBox(selected);
@@ -90,12 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function selectCell(index) {
     if (gameComplete) return;
+    dismissHint();
     selected = (selected === index) ? -1 : index;
     render();
   }
 
   function enterNumber(num) {
     if (selected < 0 || puzzle[selected] !== 0 || gameComplete) return;
+    dismissHint();
 
     if (noteMode) {
       history.push({ index: selected, value: current[selected], notes: new Set(notes[selected]) });
@@ -156,14 +163,41 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.classList.toggle('active', noteMode);
   }
 
+  let activeHint = null;
+
   function showHint() {
-    if (selected < 0 || puzzle[selected] !== 0 || gameComplete) return;
-    history.push({ index: selected, value: current[selected], notes: new Set(notes[selected]) });
-    current[selected] = solution[selected];
-    notes[selected].clear();
+    if (gameComplete) return;
+    dismissHint();
+
+    const move = SudokuTechniques.findNextMove(current);
+    if (!move) return;
+
+    activeHint = move;
+    selected = move.index;
+
+    const hintBanner = document.getElementById('hint-banner');
+    const hintText = document.getElementById('hint-text');
+    hintText.textContent = move.explanation;
+    hintBanner.classList.add('visible');
+
+    render();
+  }
+
+  function applyHint() {
+    if (!activeHint) return;
+    const { index, value } = activeHint;
+    history.push({ index, value: current[index], notes: new Set(notes[index]) });
+    current[index] = value;
+    notes[index].clear();
+    dismissHint();
     render();
     updateNumpadCompletion();
     checkWin();
+  }
+
+  function dismissHint() {
+    activeHint = null;
+    document.getElementById('hint-banner').classList.remove('visible');
   }
 
   function updateNumpadCompletion() {
@@ -214,6 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-erase').addEventListener('click', erase);
   document.getElementById('btn-notes').addEventListener('click', toggleNoteMode);
   document.getElementById('btn-hint').addEventListener('click', showHint);
+  document.getElementById('hint-apply').addEventListener('click', applyHint);
+  document.getElementById('hint-dismiss').addEventListener('click', () => { dismissHint(); render(); });
   document.getElementById('btn-new').addEventListener('click', newGame);
   difficultyEl.addEventListener('change', newGame);
 
