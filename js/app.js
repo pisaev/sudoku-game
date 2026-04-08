@@ -487,6 +487,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('stats-overlay').classList.remove('visible');
   });
 
+  // Theme toggle
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('btn-theme').textContent = theme === 'light' ? '☀️' : '🌙';
+    localStorage.setItem('sudoku-theme', theme);
+  }
+
+  document.getElementById('btn-theme').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  applyTheme(localStorage.getItem('sudoku-theme') || 'dark');
+
   document.getElementById('btn-play-again').addEventListener('click', () => {
     modalOverlay.classList.remove('visible');
     newGame();

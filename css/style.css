@@ -1,4 +1,4 @@
-:root {
+:root, [data-theme="dark"] {
   --bg-primary: #1a1a2e;
   --bg-secondary: #16213e;
   --bg-cell: #0f3460;
@@ -17,6 +17,27 @@
   --btn-hover: #1a3a5e;
   --btn-active: #e94560;
   --success: #51cf66;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #fff;
+  --bg-cell: #fff;
+  --bg-cell-given: #e8edf2;
+  --bg-cell-selected: #e94560;
+  --bg-cell-highlight: #dce6f0;
+  --bg-cell-same-number: #c5d5e8;
+  --text-primary: #222;
+  --text-given: #1a5276;
+  --text-entered: #333;
+  --text-error: #d63031;
+  --text-notes: #777;
+  --border-thin: #c8d0d8;
+  --border-thick: #6b7d8e;
+  --btn-bg: #e4e8ed;
+  --btn-hover: #d0d6dd;
+  --btn-active: #e94560;
+  --success: #27ae60;
 }
 
 * {
@@ -62,6 +83,15 @@ header h1 {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+#btn-theme {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
 }
 
 #timer {
