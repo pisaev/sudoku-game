@@ -124,3 +124,5 @@ const Sudoku = (() => {
 
   return { generate, validate, isSolved, getRow, getCol, getBox };
 })();
+
+if (typeof module !== 'undefined') module.exports = Sudoku;
