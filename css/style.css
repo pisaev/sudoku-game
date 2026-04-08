@@ -96,6 +96,43 @@ header h1 {
   background: var(--btn-hover);
 }
 
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.toggle input[type="checkbox"] {
+  accent-color: var(--btn-active);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.mistake-flash {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 107, 107, 0.95);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 90;
+  pointer-events: none;
+  animation: fade-out 2s forwards;
+}
+
+@keyframes fade-out {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 .board-container {
   width: 100%;
   max-width: 500px;

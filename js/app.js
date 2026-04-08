@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let notes = Array.from({ length: 81 }, () => new Set());
   let selected = -1;
   let noteMode = false;
+  let autoNotesEnabled = false;
+  let checkMovesEnabled = false;
   let history = [];
   let timerSeconds = 0;
   let timerInterval = null;
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(timerInterval);
     timerInterval = setInterval(tick, 1000);
     updateNoteButton();
+    if (autoNotesEnabled) fillAutoNotes();
     render();
     updateNumpadCompletion();
   }
@@ -113,12 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       current[selected] = 0;
     } else {
+      if (checkMovesEnabled && num !== solution[selected]) {
+        showMistakeWarning(`${num} is not correct here`);
+        return;
+      }
       history.push({ index: selected, value: current[selected], notes: new Set(notes[selected]) });
       current[selected] = (current[selected] === num) ? 0 : num;
       notes[selected].clear();
       if (current[selected] !== 0) {
         removeNoteFromPeers(selected, current[selected]);
       }
+      if (autoNotesEnabled) fillAutoNotes();
     }
 
     render();
@@ -133,6 +141,25 @@ document.addEventListener('DOMContentLoaded', () => {
         notes[i].delete(num);
       }
     }
+  }
+
+  function fillAutoNotes() {
+    const candidates = SudokuTechniques.getCandidates(current);
+    for (let i = 0; i < 81; i++) {
+      if (current[i] === 0) {
+        notes[i] = candidates[i];
+      } else {
+        notes[i] = new Set();
+      }
+    }
+  }
+
+  function showMistakeWarning(message) {
+    const el = document.createElement('div');
+    el.className = 'mistake-flash';
+    el.textContent = message;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
   }
 
   function erase() {
@@ -251,6 +278,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hint-apply').addEventListener('click', applyHint);
   document.getElementById('hint-dismiss').addEventListener('click', () => { dismissHint(); render(); });
   document.getElementById('btn-new').addEventListener('click', newGame);
+  document.getElementById('chk-auto-notes').addEventListener('change', (e) => {
+    autoNotesEnabled = e.target.checked;
+    if (autoNotesEnabled) fillAutoNotes();
+    else notes = Array.from({ length: 81 }, () => new Set());
+    render();
+  });
+  document.getElementById('chk-check-moves').addEventListener('change', (e) => {
+    checkMovesEnabled = e.target.checked;
+  });
   difficultyEl.addEventListener('change', newGame);
 
   document.getElementById('btn-play-again').addEventListener('click', () => {
