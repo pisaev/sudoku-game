@@ -356,6 +356,71 @@ document.addEventListener('DOMContentLoaded', () => {
     else { tutorialOverlay.classList.remove('visible'); }
   });
 
+  // Learn mode
+  const lessons = [
+    {
+      id: 'naked-single',
+      title: '🔢 Naked Single',
+      desc: 'When a cell has only one possible candidate left, that\'s a naked single. All other numbers are eliminated by its row, column, or box. This is the most basic solving technique.',
+      difficulty: 'beginner'
+    },
+    {
+      id: 'hidden-single',
+      title: '🔍 Hidden Single',
+      desc: 'When a number can only fit in one cell within a row, column, or box, that\'s a hidden single. The cell may have other candidates, but this number has no other home in that unit.',
+      difficulty: 'novice'
+    },
+    {
+      id: 'naked-pair',
+      title: '👯 Naked Pair',
+      desc: 'When two cells in the same unit share the exact same two candidates, those values can be eliminated from all other cells in that unit. This often reveals hidden or naked singles.',
+      difficulty: 'medium'
+    }
+  ];
+
+  let selectedLesson = null;
+  const learnOverlay = document.getElementById('learn-overlay');
+
+  function showLearnMenu() {
+    selectedLesson = null;
+    const menu = document.getElementById('learn-menu');
+    menu.innerHTML = '';
+    for (const lesson of lessons) {
+      const btn = document.createElement('button');
+      btn.innerHTML = `${lesson.title}<span class="lesson-tag">Difficulty: ${lesson.difficulty}</span>`;
+      btn.addEventListener('click', () => selectLesson(lesson));
+      menu.appendChild(btn);
+    }
+    document.getElementById('learn-title').textContent = '📚 Learn Techniques';
+    document.getElementById('learn-desc').textContent = 'Choose a technique to learn and practice:';
+    document.getElementById('learn-practice').style.display = 'none';
+    menu.style.display = 'flex';
+    learnOverlay.classList.add('visible');
+  }
+
+  function selectLesson(lesson) {
+    selectedLesson = lesson;
+    document.getElementById('learn-title').textContent = lesson.title;
+    document.getElementById('learn-desc').textContent = lesson.desc;
+    document.getElementById('learn-practice').style.display = 'inline-block';
+    document.getElementById('learn-menu').style.display = 'none';
+  }
+
+  function startPractice() {
+    if (!selectedLesson) return;
+    learnOverlay.classList.remove('visible');
+    difficultyEl.value = selectedLesson.difficulty;
+    newGame();
+    autoNotesEnabled = true;
+    document.getElementById('chk-auto-notes').checked = true;
+    fillAutoNotes();
+    render();
+  }
+
+  document.getElementById('btn-learn').addEventListener('click', showLearnMenu);
+  document.getElementById('learn-practice').addEventListener('click', startPractice);
+  document.getElementById('learn-close').addEventListener('click', () => learnOverlay.classList.remove('visible'));
+
   document.getElementById('btn-play-again').addEventListener('click', () => {
     modalOverlay.classList.remove('visible');
     newGame();

@@ -510,11 +510,101 @@ header h1 {
   color: #888;
 }
 
-#btn-tutorial {
+#btn-tutorial, #btn-learn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   padding: 0;
   font-weight: 700;
   font-size: 1rem;
+}
+
+.learn-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.learn-overlay.visible { display: flex; }
+
+.learn-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-thick);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 440px;
+  width: 92%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.learn-panel h2 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: var(--btn-active);
+}
+
+.learn-panel p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #ccc;
+  margin-bottom: 12px;
+}
+
+.learn-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.learn-menu button {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--btn-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-thin);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.learn-menu button:hover { background: var(--btn-hover); }
+
+.learn-menu button .lesson-tag {
+  font-size: 0.7rem;
+  color: #888;
+  display: block;
+  margin-top: 2px;
+}
+
+.learn-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.learn-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-thin);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+#learn-practice {
+  background: var(--btn-active);
+  color: #fff;
+  border-color: var(--btn-active);
+  font-weight: 600;
+}
+
+#learn-close {
+  background: var(--btn-bg);
+  color: var(--text-primary);
 }
