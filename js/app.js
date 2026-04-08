@@ -19,6 +19,34 @@ document.addEventListener('DOMContentLoaded', () => {
   let timerInterval = null;
   let gameComplete = false;
 
+  function loadProgress() {
+    try { return JSON.parse(localStorage.getItem('sudoku-progress')) || defaultProgress(); }
+    catch { return defaultProgress(); }
+  }
+
+  function defaultProgress() {
+    return { gamesCompleted: {}, techniquesUsed: {}, bestTimes: {} };
+  }
+
+  function saveProgress(progress) {
+    localStorage.setItem('sudoku-progress', JSON.stringify(progress));
+  }
+
+  function recordWin(difficulty, seconds) {
+    const progress = loadProgress();
+    progress.gamesCompleted[difficulty] = (progress.gamesCompleted[difficulty] || 0) + 1;
+    if (!progress.bestTimes[difficulty] || seconds < progress.bestTimes[difficulty]) {
+      progress.bestTimes[difficulty] = seconds;
+    }
+    saveProgress(progress);
+  }
+
+  function recordTechnique(technique) {
+    const progress = loadProgress();
+    progress.techniquesUsed[technique] = (progress.techniquesUsed[technique] || 0) + 1;
+    saveProgress(progress);
+  }
+
   function newGame() {
     const diff = difficultyEl.value;
     const classified = ['beginner', 'novice'];
@@ -215,10 +243,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyHint() {
     if (!activeHint) return;
-    const { index, value } = activeHint;
+    const { index, value, technique } = activeHint;
     history.push({ index, value: current[index], notes: new Set(notes[index]) });
     current[index] = value;
     notes[index].clear();
+    recordTechnique(technique);
     dismissHint();
     render();
     updateNumpadCompletion();
@@ -242,6 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (Sudoku.isSolved(current)) {
       gameComplete = true;
       clearInterval(timerInterval);
+      recordWin(difficultyEl.value, timerSeconds);
       const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
       const s = String(timerSeconds % 60).padStart(2, '0');
       modalTime.textContent = `${m}:${s}`;
@@ -420,6 +450,42 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-learn').addEventListener('click', showLearnMenu);
   document.getElementById('learn-practice').addEventListener('click', startPractice);
   document.getElementById('learn-close').addEventListener('click', () => learnOverlay.classList.remove('visible'));
+
+  // Stats
+  function showStats() {
+    const progress = loadProgress();
+    const statsContent = document.getElementById('stats-content');
+    const diffs = ['beginner', 'novice', 'easy', 'medium', 'hard'];
+    const techs = [
+      { id: 'naked-single', name: 'Naked Single', target: 10 },
+      { id: 'hidden-single', name: 'Hidden Single', target: 10 },
+      { id: 'naked-pair', name: 'Naked Pair', target: 5 }
+    ];
+
+    let html = '<h3>Games Completed</h3>';
+    for (const d of diffs) {
+      const count = progress.gamesCompleted[d] || 0;
+      const best = progress.bestTimes[d];
+      const timeStr = best ? `${Math.floor(best / 60)}:${String(best % 60).padStart(2, '0')}` : '—';
+      html += `<div class="stat-row"><span>${d.charAt(0).toUpperCase() + d.slice(1)}</span><span class="stat-value">${count} games · best ${timeStr}</span></div>`;
+    }
+
+    html += '<h3>Techniques Mastered</h3>';
+    for (const t of techs) {
+      const count = progress.techniquesUsed[t.id] || 0;
+      const pct = Math.min(100, Math.round((count / t.target) * 100));
+      html += `<div class="stat-row"><span>${t.name}</span><span class="stat-value">${count} uses</span></div>`;
+      html += `<div class="skill-bar"><div class="fill" style="width: ${pct}%"></div></div>`;
+    }
+
+    statsContent.innerHTML = html;
+    document.getElementById('stats-overlay').classList.add('visible');
+  }
+
+  document.getElementById('btn-stats').addEventListener('click', showStats);
+  document.getElementById('stats-close').addEventListener('click', () => {
+    document.getElementById('stats-overlay').classList.remove('visible');
+  });
 
   document.getElementById('btn-play-again').addEventListener('click', () => {
     modalOverlay.classList.remove('visible');
