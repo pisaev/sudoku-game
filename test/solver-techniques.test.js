@@ -150,3 +150,21 @@ describe('classifyPuzzle', () => {
     }
   });
 });
+
+describe('generateClassified', () => {
+  it('should generate a beginner puzzle solvable with naked singles only', () => {
+    const { puzzle } = SudokuTechniques.generateClassified('beginner');
+    assert.ok(SudokuTechniques.solvableWith(puzzle, ['naked-single']));
+  });
+
+  it('should generate a novice puzzle solvable with singles', () => {
+    const { puzzle } = SudokuTechniques.generateClassified('novice');
+    assert.ok(SudokuTechniques.solvableWith(puzzle, ['naked-single', 'hidden-single']));
+  });
+
+  it('should always return a valid puzzle and solution', () => {
+    const { puzzle, solution } = SudokuTechniques.generateClassified('beginner');
+    assert.equal(puzzle.length, 81);
+    assert.ok(Sudoku.isSolved(solution));
+  });
+});

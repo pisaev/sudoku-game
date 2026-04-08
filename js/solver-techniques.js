@@ -183,6 +183,18 @@ const SudokuTechniques = ((Sudoku) => {
     return 'advanced';
   }
 
+  function generateClassified(targetClass, maxAttempts) {
+    maxAttempts = maxAttempts || 50;
+    const diffMap = { beginner: 'easy', novice: 'easy', intermediate: 'medium', advanced: 'hard' };
+    const baseDifficulty = diffMap[targetClass] || 'medium';
+
+    for (let i = 0; i < maxAttempts; i++) {
+      const result = Sudoku.generate(baseDifficulty);
+      if (classifyPuzzle(result.puzzle) === targetClass) return result;
+    }
+    return Sudoku.generate(baseDifficulty);
+  }
+
   return {
     getCandidates,
     findNakedSingle,
@@ -190,7 +202,8 @@ const SudokuTechniques = ((Sudoku) => {
     findNakedPair,
     findNextMove,
     solvableWith,
-    classifyPuzzle
+    classifyPuzzle,
+    generateClassified
   };
 })(typeof Sudoku !== 'undefined' ? Sudoku : require('./sudoku'));
 

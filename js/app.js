@@ -21,7 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function newGame() {
     const diff = difficultyEl.value;
-    const result = Sudoku.generate(diff);
+    const classified = ['beginner', 'novice'];
+    const result = classified.includes(diff)
+      ? SudokuTechniques.generateClassified(diff)
+      : Sudoku.generate(diff);
     puzzle = result.puzzle;
     solution = result.solution;
     current = [...puzzle];
