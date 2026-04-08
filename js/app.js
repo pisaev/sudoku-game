@@ -47,6 +47,29 @@ document.addEventListener('DOMContentLoaded', () => {
     saveProgress(progress);
   }
 
+  function saveGameState() {
+    const state = {
+      puzzle, solution, current, timerSeconds, gameComplete,
+      difficulty: difficultyEl.value,
+      notes: notes.map(s => [...s])
+    };
+    localStorage.setItem('sudoku-game-state', JSON.stringify(state));
+  }
+
+  function loadGameState() {
+    try {
+      const raw = localStorage.getItem('sudoku-game-state');
+      if (!raw) return null;
+      const state = JSON.parse(raw);
+      if (!state.puzzle || !state.solution || !state.current) return null;
+      return state;
+    } catch { return null; }
+  }
+
+  function clearGameState() {
+    localStorage.removeItem('sudoku-game-state');
+  }
+
   function newGame() {
     const diff = difficultyEl.value;
     const classified = ['beginner', 'novice'];
@@ -69,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (autoNotesEnabled) fillAutoNotes();
     render();
     updateNumpadCompletion();
+    clearGameState();
   }
 
   function tick() {
@@ -163,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
     updateNumpadCompletion();
     checkWin();
+    saveGameState();
   }
 
   function removeNoteFromPeers(index, num) {
@@ -200,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     notes[selected].clear();
     render();
     updateNumpadCompletion();
+    saveGameState();
   }
 
   function undo() {
@@ -209,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     notes[last.index] = last.notes;
     render();
     updateNumpadCompletion();
+    saveGameState();
   }
 
   function toggleNoteMode() {
@@ -252,9 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
     updateNumpadCompletion();
     checkWin();
+    saveGameState();
   }
 
-  function dismissHint() {
+  function dismissHint(){
     activeHint = null;
     document.getElementById('hint-banner').classList.remove('visible');
   }
@@ -272,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
       gameComplete = true;
       clearInterval(timerInterval);
       recordWin(difficultyEl.value, timerSeconds);
+      clearGameState();
       const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
       const s = String(timerSeconds % 60).padStart(2, '0');
       modalTime.textContent = `${m}:${s}`;
@@ -506,5 +535,26 @@ document.addEventListener('DOMContentLoaded', () => {
     newGame();
   });
 
-  newGame();
+  // Restore saved game or start new
+  const saved = loadGameState();
+  if (saved && !saved.gameComplete) {
+    puzzle = saved.puzzle;
+    solution = saved.solution;
+    current = saved.current;
+    notes = saved.notes.map(a => new Set(a));
+    timerSeconds = saved.timerSeconds || 0;
+    gameComplete = false;
+    difficultyEl.value = saved.difficulty || 'medium';
+    selected = -1;
+    noteMode = false;
+    history = [];
+    activeHint = null;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
+    updateNoteButton();
+    render();
+    updateNumpadCompletion();
+  } else {
+    newGame();
+  }
 });

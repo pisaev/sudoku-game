@@ -2,12 +2,12 @@
   --bg-primary: #1a1a2e;
   --bg-secondary: #16213e;
   --bg-cell: #0f3460;
-  --bg-cell-given: #112a50;
+  --bg-cell-given: #0f3460;
   --bg-cell-selected: #3b82f6;
   --bg-cell-highlight: #1c3a6e;
   --bg-cell-same-number: #2a4a7e;
   --text-primary: #eee;
-  --text-given: #a0bfe0;
+  --text-given: #c0d4ea;
   --text-entered: #fff;
   --text-error: #ff6b6b;
   --text-notes: #aaa;
@@ -23,11 +23,11 @@
   --bg-primary: #f0f2f5;
   --bg-secondary: #fff;
   --bg-cell: #fff;
-  --bg-cell-given: #e9edf2;
+  --bg-cell-given: #f6f7f9;
   --bg-cell-selected: #2563eb;  --bg-cell-highlight: #dce6f0;
   --bg-cell-same-number: #c5d5e8;
   --text-primary: #222;
-  --text-given: #3a5a7a;
+  --text-given: #555;
   --text-entered: #333;
   --text-error: #d63031;
   --text-notes: #777;
