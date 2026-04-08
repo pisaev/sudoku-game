@@ -377,7 +377,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tutorial-next').textContent = tutorialStep === tutorialSteps.length - 1 ? 'Start Playing!' : 'Next →';
   }
 
-  document.getElementById('btn-tutorial').addEventListener('click', showTutorial);
+  document.getElementById('btn-tutorial').addEventListener('click', () => {
+    Onboarding.reset();
+    Onboarding.start();
+  });
   document.getElementById('tutorial-prev').addEventListener('click', () => {
     if (tutorialStep > 0) { tutorialStep--; renderTutorialStep(); }
   });
@@ -507,4 +510,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   newGame();
+
+  if (Onboarding.shouldShow()) {
+    setTimeout(() => Onboarding.start(), 500);
+  }
 });

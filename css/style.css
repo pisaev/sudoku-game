@@ -720,3 +720,86 @@ header h1 {
   background: var(--btn-bg);
   color: var(--text-primary);
 }
+
+/* Onboarding */
+.onboarding-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+}
+
+.onboarding-overlay.visible {
+  display: block;
+}
+
+.onboarding-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 202;
+  background: var(--bg-secondary);
+  border: 2px solid var(--btn-active);
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 320px;
+  width: 85%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  left: 50%;
+  transform: translateX(-50%);
+  animation: tooltip-in 0.25s ease-out;
+}
+
+.onboarding-tooltip.visible {
+  display: block;
+}
+
+@keyframes tooltip-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+#onboarding-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+#onboarding-text strong {
+  color: var(--btn-active);
+}
+
+.onboarding-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.onboarding-buttons button {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+#onboarding-skip {
+  background: transparent;
+  color: #888;
+  border: 1px solid var(--border-thin);
+}
+
+#onboarding-next {
+  background: var(--btn-active);
+  color: #fff;
+  flex: 1;
+}
+
+.onboarding-spotlight {
+  position: relative;
+  z-index: 201;
+  box-shadow: 0 0 0 4px var(--btn-active), 0 0 16px rgba(233, 69, 96, 0.4);
+  border-radius: 6px;
+}
