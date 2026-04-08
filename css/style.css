@@ -330,8 +330,9 @@ header h1 {
   width: 100%;
   max-width: 500px;
   padding: 8px 12px;
-  background: #1b4332;
-  border: 1px solid #2d6a4f;
+  background: #e8f5e9;
+  border: 1px solid #66bb6a;
+  color: #1b5e20;
   border-radius: 8px;
   color: var(--text-primary);
   font-size: 0.85rem;
@@ -350,7 +351,8 @@ header h1 {
 
 .hint-banner button {
   background: none;
-  border: 1px solid #2d6a4f;
+  border: 1px solid #66bb6a;
+  color: #1b5e20;
   color: var(--text-primary);
   border-radius: 6px;
   padding: 4px 10px;
@@ -360,9 +362,9 @@ header h1 {
 }
 
 .hint-banner #hint-apply {
-  background: var(--success);
-  color: #000;
-  border-color: var(--success);
+  background: #43a047;
+  color: #fff;
+  border-color: #43a047;
   font-weight: 600;
 }
 
