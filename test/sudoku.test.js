@@ -113,7 +113,7 @@ describe('generate', () => {
     }
   });
 
-  for (const [difficulty, target] of [['easy', 38], ['medium', 30], ['hard', 24]]) {
+  for (const [difficulty, target] of [['easy', 38], ['medium', 30], ['hard', 24], ['extreme', 20]]) {
     it(`should produce close to ${target} clues for ${difficulty} difficulty`, () => {
       const { puzzle } = Sudoku.generate(difficulty);
       const clues = puzzle.filter(v => v !== 0).length;

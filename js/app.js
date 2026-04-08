@@ -484,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showStats() {
     const progress = loadProgress();
     const statsContent = document.getElementById('stats-content');
-    const diffs = ['beginner', 'novice', 'easy', 'medium', 'hard'];
+    const diffs = ['beginner', 'novice', 'easy', 'medium', 'hard', 'extreme'];
     const techs = [
       { id: 'naked-single', name: 'Naked Single', target: 10 },
       { id: 'hidden-single', name: 'Hidden Single', target: 10 },

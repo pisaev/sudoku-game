@@ -80,7 +80,7 @@ const Sudoku = (() => {
   }
 
   function generate(difficulty = 'medium') {
-    const clueCount = { easy: 38, medium: 30, hard: 24 };
+    const clueCount = { easy: 38, medium: 30, hard: 24, extreme: 20 };
     const target = clueCount[difficulty] || 30;
 
     const solution = solve(createEmpty(), true);
