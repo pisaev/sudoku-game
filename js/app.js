@@ -292,6 +292,70 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   difficultyEl.addEventListener('change', newGame);
 
+  // Tutorial
+  const tutorialSteps = [
+    {
+      title: '🎯 Welcome to Sudoku!',
+      body: '<p>Sudoku is a number puzzle. The goal is simple: fill every cell with a number from 1 to 9.</p><p>But there\'s a catch — each number can appear <strong>only once</strong> in every row, column, and 3×3 box.</p>'
+    },
+    {
+      title: '📐 Rows, Columns & Boxes',
+      body: '<p>The board has <strong>9 rows</strong> (horizontal), <strong>9 columns</strong> (vertical), and <strong>9 boxes</strong> (the 3×3 sections).</p><p>Each must contain all numbers 1–9, with no repeats. When you select a cell, its row, column, and box are highlighted.</p>'
+    },
+    {
+      title: '🔢 Naked Single',
+      body: '<p>The simplest technique: if a cell\'s row, column, and box already contain 8 of the 9 numbers, the missing number <strong>must</strong> go there.</p><p>Example: if a row has 1,2,3,4,5,6,7,8 — the empty cell must be <strong>9</strong>.</p><p>Start with <strong>Beginner</strong> difficulty to practice this!</p>'
+    },
+    {
+      title: '🔍 Hidden Single',
+      body: '<p>Sometimes a number can only fit in <strong>one cell</strong> within a row, column, or box — even though that cell has multiple candidates.</p><p>Look for where a number is "hiding" — it has only one home in its unit.</p><p><strong>Novice</strong> difficulty puzzles use this technique.</p>'
+    },
+    {
+      title: '✏️ Notes & Auto-Notes',
+      body: '<p>Use <strong>Notes mode</strong> (✏️ button or <kbd>N</kbd> key) to write small candidate numbers in cells — helps you track possibilities.</p><p>Or enable <strong>Auto Notes</strong> in the toolbar to let the game fill candidates automatically!</p>'
+    },
+    {
+      title: '💡 Smart Hints',
+      body: '<p>Stuck? Tap the <strong>💡 Hint</strong> button. It won\'t just give you the answer — it\'ll explain <em>why</em> that number goes there, teaching you the technique.</p><p>You can <strong>Apply</strong> the hint or <strong>dismiss</strong> it and try yourself.</p>'
+    },
+    {
+      title: '🎮 Controls',
+      body: '<p><strong>Tap a cell</strong> to select it, then tap a number to place it.</p><p><strong>↩ Undo</strong> — take back your last move</p><p><strong>⌫ Erase</strong> — clear the selected cell</p><p><strong>Check Moves</strong> — enable to prevent wrong entries</p><p>Keyboard: <kbd>1</kbd>–<kbd>9</kbd>, arrows, <kbd>Backspace</kbd>, <kbd>Ctrl+Z</kbd></p>'
+    },
+    {
+      title: '🚀 Ready to Play!',
+      body: '<p>Start with <strong>Beginner</strong> and work your way up. Each difficulty teaches new techniques naturally.</p><p><strong>Beginner</strong> → naked singles<br><strong>Novice</strong> → hidden singles<br><strong>Easy/Medium/Hard</strong> → full challenge</p><p>Have fun! 🧩</p>'
+    }
+  ];
+
+  let tutorialStep = 0;
+  const tutorialOverlay = document.getElementById('tutorial-overlay');
+  const tutorialStepEl = document.getElementById('tutorial-step');
+  const tutorialProgress = document.getElementById('tutorial-progress');
+
+  function showTutorial() {
+    tutorialStep = 0;
+    renderTutorialStep();
+    tutorialOverlay.classList.add('visible');
+  }
+
+  function renderTutorialStep() {
+    const step = tutorialSteps[tutorialStep];
+    tutorialStepEl.innerHTML = `<h2>${step.title}</h2>${step.body}`;
+    tutorialProgress.textContent = `${tutorialStep + 1} / ${tutorialSteps.length}`;
+    document.getElementById('tutorial-prev').style.visibility = tutorialStep === 0 ? 'hidden' : 'visible';
+    document.getElementById('tutorial-next').textContent = tutorialStep === tutorialSteps.length - 1 ? 'Start Playing!' : 'Next →';
+  }
+
+  document.getElementById('btn-tutorial').addEventListener('click', showTutorial);
+  document.getElementById('tutorial-prev').addEventListener('click', () => {
+    if (tutorialStep > 0) { tutorialStep--; renderTutorialStep(); }
+  });
+  document.getElementById('tutorial-next').addEventListener('click', () => {
+    if (tutorialStep < tutorialSteps.length - 1) { tutorialStep++; renderTutorialStep(); }
+    else { tutorialOverlay.classList.remove('visible'); }
+  });
+
   document.getElementById('btn-play-again').addEventListener('click', () => {
     modalOverlay.classList.remove('visible');
     newGame();

@@ -412,3 +412,109 @@ header h1 {
   .cell { font-size: 1.8rem; }
   .numpad button { font-size: 1.5rem; }
 }
+
+.tutorial-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.tutorial-overlay.visible {
+  display: flex;
+}
+
+.tutorial {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-thick);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 440px;
+  width: 92%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.tutorial-step h2 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: var(--btn-active);
+}
+
+.tutorial-step p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  color: #ccc;
+}
+
+.tutorial-step .mini-grid {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 28px);
+  grid-template-rows: repeat(3, 28px);
+  border: 2px solid var(--border-thick);
+  margin: 8px auto;
+  border-radius: 4px;
+}
+
+.tutorial-step .mini-grid .mc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-cell);
+  border: 1px solid var(--border-thin);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-given);
+}
+
+.tutorial-step .mini-grid .mc.empty {
+  color: var(--btn-active);
+}
+
+.tutorial-step kbd {
+  background: var(--btn-bg);
+  border: 1px solid var(--border-thin);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.8rem;
+}
+
+.tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  gap: 8px;
+}
+
+.tutorial-nav button {
+  padding: 8px 16px;
+  background: var(--btn-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-thin);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.tutorial-nav button:hover {
+  background: var(--btn-hover);
+}
+
+.tutorial-nav #tutorial-progress {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+#btn-tutorial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  padding: 0;
+  font-weight: 700;
+  font-size: 1rem;
+}
