@@ -111,11 +111,16 @@ const Onboarding = (() => {
       const cell = board.children[step.guidedCell];
       if (cell) {
         const cellRect = cell.getBoundingClientRect();
-        const tooltipHeight = tooltip.offsetHeight || 150;
-        let top = cellRect.top - tooltipHeight - 8;
-        if (top < 4) top = 4;
+        const boardRect = board.getBoundingClientRect();
+        const boardMidY = boardRect.top + boardRect.height / 2;
         tooltip.style.transform = 'translateX(-50%)';
-        tooltip.style.top = top + 'px';
+
+        if (cellRect.top < boardMidY) {
+          tooltip.style.top = (cellRect.bottom + 8) + 'px';
+        } else {
+          const tooltipHeight = tooltip.offsetHeight || 150;
+          tooltip.style.top = Math.max(4, cellRect.top - tooltipHeight - 8) + 'px';
+        }
         return;
       }
     }
