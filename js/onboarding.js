@@ -34,7 +34,7 @@ const Onboarding = (() => {
             move.explanation +
             `<br><br>👆 <strong>Tap that cell</strong>, then <strong>tap ${move.value}</strong> on the numpad.`,
       target: null,
-      position: 'top-fixed',
+      position: 'near-cell',
       waitFor: 'guided-move',
       guidedCell: move.index,
       guidedValue: move.value
@@ -101,14 +101,32 @@ const Onboarding = (() => {
   }
 
   function positionTooltip(step) {
-    const target = step.target ? document.querySelector(step.target) : null;
+    tooltip.style.top = '';
+    tooltip.style.bottom = '';
 
-    if (step.position === 'top-fixed') {
-      tooltip.style.bottom = '';
-      tooltip.style.top = '10px';
-      tooltip.style.transform = 'translateX(-50%)';
-      return;
+    if (step.position === 'near-cell' && step.guidedCell !== undefined) {
+      const board = document.getElementById('board');
+      const cell = board.children[step.guidedCell];
+      const numpad = document.querySelector('.numpad');
+      if (cell && numpad) {
+        const cellRect = cell.getBoundingClientRect();
+        const boardRect = board.getBoundingClientRect();
+        const numpadRect = numpad.getBoundingClientRect();
+        const cellMidY = cellRect.top + cellRect.height / 2;
+        const boardMidY = boardRect.top + boardRect.height / 2;
+
+        tooltip.style.transform = 'translateX(-50%)';
+        if (cellMidY < boardMidY) {
+          const gap = numpadRect.top - boardRect.bottom;
+          tooltip.style.top = (boardRect.bottom + Math.max(4, gap / 2 - 60)) + 'px';
+        } else {
+          tooltip.style.top = Math.max(4, boardRect.top - tooltip.offsetHeight - 8) + 'px';
+        }
+        return;
+      }
     }
+
+    const target = step.target ? document.querySelector(step.target) : null;
 
     if (!target || step.position === 'center') {
       tooltip.style.top = '50%';
@@ -123,7 +141,6 @@ const Onboarding = (() => {
       tooltip.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
       tooltip.style.removeProperty('top');
     } else {
-      tooltip.style.bottom = '';
       tooltip.style.top = (rect.bottom + 10) + 'px';
     }
   }
