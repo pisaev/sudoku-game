@@ -33,8 +33,8 @@ const Onboarding = (() => {
       text: `🎯 Let's solve one! Look at <strong>row ${row}, column ${col}</strong>. ` +
             move.explanation +
             `<br><br>👆 <strong>Tap that cell</strong>, then <strong>tap ${move.value}</strong> on the numpad.`,
-      target: '#board',
-      position: 'below',
+      target: null,
+      position: 'top-fixed',
       waitFor: 'guided-move',
       guidedCell: move.index,
       guidedValue: move.value
@@ -72,10 +72,13 @@ const Onboarding = (() => {
         waitFor: 'number-enter'
       },
       {
-        text: '👍 Nice! If it conflicts, it turns <strong style="color:var(--text-error)">red</strong>. Now let\'s solve a few cells together!',
+        text: '👍 Nice! If it conflicts, it turns <strong style="color:var(--text-error)">red</strong>. Let me undo that for you — now let\'s solve a few cells together with my help!',
         target: '#board',
         position: 'below',
-        nextLabel: "Let's solve!"
+        nextLabel: "Let's solve!",
+        onEnter: function() {
+          document.getElementById('btn-undo').click();
+        }
       }
     ];
 
@@ -102,6 +105,13 @@ const Onboarding = (() => {
 
   function positionTooltip(step) {
     const target = step.target ? document.querySelector(step.target) : null;
+
+    if (step.position === 'top-fixed') {
+      tooltip.style.bottom = '';
+      tooltip.style.top = '10px';
+      tooltip.style.transform = 'translateX(-50%)';
+      return;
+    }
 
     if (!target || step.position === 'center') {
       tooltip.style.top = '50%';
@@ -167,8 +177,15 @@ const Onboarding = (() => {
     spotlightOn(step.target);
     positionTooltip(step);
 
-    overlay.classList.add('visible');
+    if (step.onEnter) step.onEnter();
+
     tooltip.classList.add('visible');
+
+    if (step.waitFor === 'guided-move') {
+      overlay.classList.remove('visible');
+    } else {
+      overlay.classList.add('visible');
+    }
 
     if (step.waitFor === 'cell-select') {
       nextBtn.style.display = 'none';
