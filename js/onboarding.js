@@ -55,7 +55,27 @@ const Onboarding = (() => {
         position: 'below'
       },
       {
-        text: '👆 <strong>Tap any empty cell</strong> to select it.',
+        text: '🎚️ Pick your <strong>difficulty</strong> here. We\'ve set it to <strong>Beginner</strong> for you — it uses the simplest solving technique.',
+        target: '#difficulty',
+        position: 'below'
+      },
+      {
+        text: '✅ <strong>Check Moves</strong> prevents wrong numbers — great for learning! <strong>Auto Notes</strong> shows all possible numbers in each cell automatically.',
+        target: '.toolbar',
+        position: 'below'
+      },
+      {
+        text: '💡 The <strong>Hint</strong> button explains <em>why</em> a number goes somewhere — it teaches you, not just gives the answer. <strong>Undo</strong> and <strong>Erase</strong> fix mistakes.',
+        target: '.actions',
+        position: 'above'
+      },
+      {
+        text: '📚 Tap <strong>Learn</strong> to study specific techniques. <strong>📊 Stats</strong> tracks your progress. <strong>⬇⬆</strong> exports/imports your game.',
+        target: '.header-controls',
+        position: 'below'
+      },
+      {
+        text: '👆 Let\'s try it! <strong>Tap any empty cell</strong> to select it.',
         target: '#board',
         position: 'below',
         waitFor: 'cell-select'

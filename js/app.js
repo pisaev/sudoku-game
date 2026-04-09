@@ -409,6 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-tutorial').addEventListener('click', () => {
     Onboarding.reset();
     difficultyEl.value = 'beginner';
+    checkMovesEnabled = true;
+    document.getElementById('chk-check-moves').checked = true;
     newGame();
     Onboarding.start();
   });
@@ -600,6 +602,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const saved = loadGameState();
   if (Onboarding.shouldShow()) {
     difficultyEl.value = 'beginner';
+    checkMovesEnabled = true;
+    document.getElementById('chk-check-moves').checked = true;
     newGame();
     setTimeout(() => Onboarding.start(), 500);
   } else if (saved && !saved.gameComplete) {
