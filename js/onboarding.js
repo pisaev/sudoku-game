@@ -163,7 +163,8 @@ const Onboarding = (() => {
         text: '🎉 <strong>Great job!</strong> You just solved real cells using logic. Keep going — use the <strong>💡 Hint</strong> button whenever you\'re stuck!',
         target: null,
         position: 'center',
-        nextLabel: 'Start Playing!'
+        nextLabel: 'Start Playing!',
+        isFinal: true
       });
       showStep();
       return;
@@ -230,16 +231,13 @@ const Onboarding = (() => {
   }
 
   function advance() {
-    stepIndex++;
-    if (stepIndex >= steps.length) {
-      if (guidedMovesLeft > 0) {
-        showStep();
-      } else {
-        showStep();
-      }
-    } else {
-      showStep();
+    const currentStep = steps[stepIndex];
+    if (currentStep && currentStep.isFinal) {
+      finish();
+      return;
     }
+    stepIndex++;
+    showStep();
   }
 
   function finish() {

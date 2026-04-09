@@ -741,13 +741,15 @@ header h1 {
   background: var(--bg-secondary);
   border: 2px solid var(--btn-active);
   border-radius: 12px;
-  padding: 16px;
-  max-width: 320px;
-  width: 85%;
+  padding: 14px;
+  max-width: 340px;
+  width: 90%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   left: 50%;
   transform: translateX(-50%);
   animation: tooltip-in 0.25s ease-out;
+  max-height: 40vh;
+  overflow-y: auto;
 }
 
 .onboarding-tooltip.visible {
@@ -760,10 +762,10 @@ header h1 {
 }
 
 #onboarding-text {
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.85rem;
+  line-height: 1.4;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 #onboarding-text strong {
