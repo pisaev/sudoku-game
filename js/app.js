@@ -406,7 +406,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tutorial-next').textContent = tutorialStep === tutorialSteps.length - 1 ? 'Start Playing!' : 'Next →';
   }
 
-  document.getElementById('btn-tutorial').addEventListener('click', showTutorial);
+  document.getElementById('btn-tutorial').addEventListener('click', () => {
+    Onboarding.reset();
+    difficultyEl.value = 'beginner';
+    newGame();
+    Onboarding.start();
+  });
   document.getElementById('tutorial-close').addEventListener('click', () => {
     tutorialOverlay.classList.remove('visible');
   });
@@ -593,7 +598,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Restore saved game or start new
   const saved = loadGameState();
-  if (saved && !saved.gameComplete) {
+  if (Onboarding.shouldShow()) {
+    difficultyEl.value = 'beginner';
+    newGame();
+    setTimeout(() => Onboarding.start(), 500);
+  } else if (saved && !saved.gameComplete) {
     puzzle = saved.puzzle;
     solution = saved.solution;
     current = saved.current;

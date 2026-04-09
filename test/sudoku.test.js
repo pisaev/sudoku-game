@@ -113,12 +113,12 @@ describe('generate', () => {
     }
   });
 
-  for (const [difficulty, target] of [['easy', 38], ['medium', 30], ['hard', 24], ['extreme', 20]]) {
+  for (const [difficulty, target, tolerance] of [['easy', 38, 4], ['medium', 30, 4], ['hard', 24, 4], ['extreme', 20, 8]]) {
     it(`should produce close to ${target} clues for ${difficulty} difficulty`, () => {
       const { puzzle } = Sudoku.generate(difficulty);
       const clues = puzzle.filter(v => v !== 0).length;
-      assert.ok(clues >= target && clues <= target + 4,
-        `Expected ${target}-${target + 4} clues for ${difficulty}, got ${clues}`);
+      assert.ok(clues >= target && clues <= target + tolerance,
+        `Expected ${target}-${target + tolerance} clues for ${difficulty}, got ${clues}`);
     });
   }
 

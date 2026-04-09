@@ -54,12 +54,24 @@ const SudokuTechniques = ((Sudoku) => {
     for (let i = 0; i < 81; i++) {
       if (board[i] !== 0 || candidates[i].size !== 1) continue;
       const value = [...candidates[i]][0];
+      const r = getRow(i), c = getCol(i), b = getBox(i);
+      const rowNums = [], colNums = [], boxNums = [];
+      for (let j = 0; j < 81; j++) {
+        if (board[j] === 0) continue;
+        if (getRow(j) === r && j !== i) rowNums.push(board[j]);
+        if (getCol(j) === c && j !== i) colNums.push(board[j]);
+        if (getBox(j) === b && j !== i) boxNums.push(board[j]);
+      }
+      const explanation = `Row ${r+1} has ${rowNums.sort().join(', ')}. ` +
+        `Column ${c+1} has ${colNums.sort().join(', ')}. ` +
+        `The 3×3 box has ${boxNums.sort().join(', ')}. ` +
+        `The only number left is <strong>${value}</strong>.`;
       return {
         technique: 'naked-single',
         index: i,
         value,
         highlights: peerCache[i].filter(p => board[p] !== 0),
-        explanation: `Cell r${getRow(i) + 1}c${getCol(i) + 1} can only be ${value} — all other values are eliminated by its peers.`
+        explanation
       };
     }
     return null;
@@ -74,6 +86,9 @@ const SudokuTechniques = ((Sudoku) => {
         const possible = empty.filter(i => candidates[i].has(n));
         if (possible.length === 1) {
           const index = possible[0];
+          const unitLabel = unit.type === 'box' ? '3×3 box' : `${unit.type} ${unit.index + 1}`;
+          const explanation = `Look at this ${unitLabel}. It needs a <strong>${n}</strong>, ` +
+            `and this cell is the only empty spot where ${n} can fit (the other empty cells already have ${n} blocked by their row, column, or box).`;
           return {
             technique: 'hidden-single',
             index,
@@ -81,7 +96,7 @@ const SudokuTechniques = ((Sudoku) => {
             unitType: unit.type,
             unitIndex: unit.index,
             highlights: empty.filter(i => i !== index),
-            explanation: `${n} can only go in r${getRow(index) + 1}c${getCol(index) + 1} within this ${unit.type} — no other cell in ${unit.type} ${unit.index + 1} can hold ${n}.`
+            explanation
           };
         }
       }
