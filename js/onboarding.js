@@ -11,11 +11,40 @@ const Onboarding = (() => {
   let steps = [];
   let currentSpotlight = null;
   let waitCleanup = null;
+  let guidedMovesLeft = 0;
+
+  function cellRef(index) {
+    return `r${Sudoku.getRow(index) + 1}c${Sudoku.getCol(index) + 1}`;
+  }
+
+  function buildGuidedMoveStep() {
+    const board = document.getElementById('board');
+    const move = SudokuTechniques.findNextMove(
+      Array.from(board.children).map((c, i) => {
+        const v = parseInt(c.textContent);
+        return (c.classList.contains('given') || c.classList.contains('entered')) && v ? v : 0;
+      })
+    );
+    if (!move) return null;
+
+    const row = Sudoku.getRow(move.index) + 1;
+    const col = Sudoku.getCol(move.index) + 1;
+    return {
+      text: `🎯 Let's solve one! Look at <strong>row ${row}, column ${col}</strong>. ` +
+            move.explanation +
+            `<br><br>👆 <strong>Tap that cell</strong>, then <strong>tap ${move.value}</strong> on the numpad.`,
+      target: '#board',
+      position: 'below',
+      waitFor: 'guided-move',
+      guidedCell: move.index,
+      guidedValue: move.value
+    };
+  }
 
   function defineSteps() {
-    return [
+    const baseSteps = [
       {
-        text: '👋 <strong>Welcome to Sudoku!</strong> Let me walk you through the game. You\'ll learn by doing — just follow along!',
+        text: '👋 <strong>Welcome to Sudoku!</strong> Let me walk you through the game — you\'ll learn by doing!',
         target: null,
         position: 'center',
         nextLabel: "Let's go!"
@@ -37,48 +66,21 @@ const Onboarding = (() => {
         position: 'below'
       },
       {
-        text: '🔢 Now <strong>tap a number</strong> on the pad below to place it in the cell.',
+        text: '🔢 Now <strong>tap a number</strong> on the pad below to place it.',
         target: '.numpad',
         position: 'above',
         waitFor: 'number-enter'
       },
       {
-        text: '👍 Nice! You just placed a number. If it conflicts with another, it\'ll turn <strong style="color:var(--text-error)">red</strong>.',
+        text: '👍 Nice! If it conflicts, it turns <strong style="color:var(--text-error)">red</strong>. Now let\'s solve a few cells together!',
         target: '#board',
-        position: 'below'
-      },
-      {
-        text: '↩ Made a mistake? <strong>Undo</strong> takes back your last move.',
-        target: '#btn-undo',
-        position: 'below'
-      },
-      {
-        text: '⌫ <strong>Erase</strong> clears the selected cell completely.',
-        target: '#btn-erase',
-        position: 'below'
-      },
-      {
-        text: '💡 Stuck? <strong>Hint</strong> won\'t just give you the answer — it\'ll explain <em>why</em> a number goes there, so you actually learn.',
-        target: '#btn-hint',
-        position: 'below'
-      },
-      {
-        text: '🎚️ Choose your <strong>difficulty</strong> here. Start with <strong>Beginner</strong> — it uses the simplest technique.',
-        target: '#difficulty',
-        position: 'below'
-      },
-      {
-        text: '✅ Enable <strong>Check Moves</strong> to prevent wrong entries, or <strong>Auto Notes</strong> to see all possibilities automatically.',
-        target: '.toolbar',
-        position: 'below'
-      },
-      {
-        text: '🎉 <strong>You\'re all set!</strong> Solve the puzzle by filling every cell. The timer tracks your speed. Have fun! 🧩',
-        target: null,
-        position: 'center',
-        nextLabel: 'Start Playing!'
+        position: 'below',
+        nextLabel: "Let's solve!"
       }
     ];
+
+    guidedMovesLeft = 3;
+    return baseSteps;
   }
 
   function spotlightOn(selector) {
@@ -111,9 +113,7 @@ const Onboarding = (() => {
     const rect = target.getBoundingClientRect();
 
     if (step.position === 'above') {
-      let top = rect.top - 10;
-      tooltip.style.top = '';
-      tooltip.style.bottom = (window.innerHeight - top) + 'px';
+      tooltip.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
       tooltip.style.removeProperty('top');
     } else {
       tooltip.style.bottom = '';
@@ -128,10 +128,39 @@ const Onboarding = (() => {
     }
   }
 
+  function highlightCell(index) {
+    const board = document.getElementById('board');
+    const cell = board.children[index];
+    if (cell) cell.classList.add('hint-target');
+  }
+
+  function clearCellHighlights() {
+    document.querySelectorAll('.hint-target').forEach(c => c.classList.remove('hint-target'));
+  }
+
   function showStep() {
     cleanupWait();
+    clearCellHighlights();
+
     const step = steps[stepIndex];
-    if (!step) { finish(); return; }
+    if (!step) {
+      if (guidedMovesLeft > 0) {
+        const moveStep = buildGuidedMoveStep();
+        if (moveStep) {
+          steps.push(moveStep);
+          showStep();
+          return;
+        }
+      }
+      steps.push({
+        text: '🎉 <strong>Great job!</strong> You just solved real cells using logic. Keep going — use the <strong>💡 Hint</strong> button whenever you\'re stuck!',
+        target: null,
+        position: 'center',
+        nextLabel: 'Start Playing!'
+      });
+      showStep();
+      return;
+    }
 
     textEl.innerHTML = step.text;
     nextBtn.textContent = step.nextLabel || 'Next';
@@ -143,22 +172,49 @@ const Onboarding = (() => {
 
     if (step.waitFor === 'cell-select') {
       nextBtn.style.display = 'none';
-      const handler = () => {
-        nextBtn.style.display = '';
-        advance();
-      };
+      const handler = () => { nextBtn.style.display = ''; advance(); };
       const board = document.getElementById('board');
       board.addEventListener('click', handler, { once: true });
       waitCleanup = () => board.removeEventListener('click', handler);
+
     } else if (step.waitFor === 'number-enter') {
       nextBtn.style.display = 'none';
-      const handler = () => {
-        nextBtn.style.display = '';
-        advance();
-      };
+      const handler = () => { nextBtn.style.display = ''; advance(); };
       const numpad = document.querySelector('.numpad');
       numpad.addEventListener('click', handler, { once: true });
       waitCleanup = () => numpad.removeEventListener('click', handler);
+
+    } else if (step.waitFor === 'guided-move') {
+      nextBtn.style.display = 'none';
+      highlightCell(step.guidedCell);
+
+      let selectedCorrectCell = false;
+      const boardHandler = (e) => {
+        const cell = e.target.closest('.cell');
+        if (cell && parseInt(cell.dataset.index) === step.guidedCell) {
+          selectedCorrectCell = true;
+        }
+      };
+      const numpadHandler = (e) => {
+        const btn = e.target.closest('button[data-num]');
+        if (btn && selectedCorrectCell && parseInt(btn.dataset.num) === step.guidedValue) {
+          setTimeout(() => {
+            guidedMovesLeft--;
+            nextBtn.style.display = '';
+            clearCellHighlights();
+            advance();
+          }, 300);
+        }
+      };
+
+      const board = document.getElementById('board');
+      const numpad = document.querySelector('.numpad');
+      board.addEventListener('click', boardHandler);
+      numpad.addEventListener('click', numpadHandler);
+      waitCleanup = () => {
+        board.removeEventListener('click', boardHandler);
+        numpad.removeEventListener('click', numpadHandler);
+      };
     } else {
       nextBtn.style.display = '';
     }
@@ -167,7 +223,11 @@ const Onboarding = (() => {
   function advance() {
     stepIndex++;
     if (stepIndex >= steps.length) {
-      finish();
+      if (guidedMovesLeft > 0) {
+        showStep();
+      } else {
+        showStep();
+      }
     } else {
       showStep();
     }
@@ -175,6 +235,7 @@ const Onboarding = (() => {
 
   function finish() {
     cleanupWait();
+    clearCellHighlights();
     spotlightOff();
     overlay.classList.remove('visible');
     tooltip.classList.remove('visible');
@@ -182,6 +243,7 @@ const Onboarding = (() => {
     tooltip.style.bottom = '';
     localStorage.setItem(STORAGE_KEY, 'true');
     stepIndex = -1;
+    guidedMovesLeft = 0;
   }
 
   function start() {

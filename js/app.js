@@ -379,6 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-tutorial').addEventListener('click', () => {
     Onboarding.reset();
+    difficultyEl.value = 'beginner';
+    newGame();
     Onboarding.start();
   });
   document.getElementById('tutorial-prev').addEventListener('click', () => {
@@ -512,6 +514,8 @@ document.addEventListener('DOMContentLoaded', () => {
   newGame();
 
   if (Onboarding.shouldShow()) {
+    difficultyEl.value = 'beginner';
+    newGame();
     setTimeout(() => Onboarding.start(), 500);
   }
 });
