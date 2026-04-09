@@ -72,13 +72,10 @@ const Onboarding = (() => {
         waitFor: 'number-enter'
       },
       {
-        text: '👍 Nice! If it conflicts, it turns <strong style="color:var(--text-error)">red</strong>. Let me undo that for you — now let\'s solve a few cells together with my help!',
+        text: '👍 Nice! You can use <strong>↩ Undo</strong> or <strong>⌫ Erase</strong> to fix mistakes. Now let\'s solve a few cells together!',
         target: '#board',
         position: 'below',
-        nextLabel: "Let's solve!",
-        onEnter: function() {
-          document.getElementById('btn-undo').click();
-        }
+        nextLabel: "Let's solve!"
       }
     ];
 
@@ -205,33 +202,28 @@ const Onboarding = (() => {
       nextBtn.style.display = 'none';
       highlightCell(step.guidedCell);
 
-      let selectedCorrectCell = false;
-      const boardHandler = (e) => {
-        const cell = e.target.closest('.cell');
-        if (cell && parseInt(cell.dataset.index) === step.guidedCell) {
-          selectedCorrectCell = true;
-        }
-      };
-      const numpadHandler = (e) => {
-        const btn = e.target.closest('button[data-num]');
-        if (btn && selectedCorrectCell && parseInt(btn.dataset.num) === step.guidedValue) {
+      const checkSolved = () => {
+        const board = document.getElementById('board');
+        const cell = board.children[step.guidedCell];
+        if (cell && cell.classList.contains('entered') && cell.textContent.trim() === String(step.guidedValue)) {
           setTimeout(() => {
             guidedMovesLeft--;
-            nextBtn.style.display = '';
             clearCellHighlights();
             advance();
-          }, 300);
+          }, 400);
+          return true;
         }
+        highlightCell(step.guidedCell);
+        return false;
       };
 
+      const observer = new MutationObserver(() => {
+        if (checkSolved()) observer.disconnect();
+      });
       const board = document.getElementById('board');
-      const numpad = document.querySelector('.numpad');
-      board.addEventListener('click', boardHandler);
-      numpad.addEventListener('click', numpadHandler);
-      waitCleanup = () => {
-        board.removeEventListener('click', boardHandler);
-        numpad.removeEventListener('click', numpadHandler);
-      };
+      observer.observe(board, { childList: true, subtree: true, characterData: true });
+
+      waitCleanup = () => observer.disconnect();
     } else {
       nextBtn.style.display = '';
     }
