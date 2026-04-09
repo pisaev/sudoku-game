@@ -7,7 +7,7 @@
   --bg-cell-highlight: #1c3a6e;
   --bg-cell-same-number: #2a4a7e;
   --text-primary: #eee;
-  --text-given: #c0d4ea;
+  --text-given: #7a9ec2;
   --text-entered: #fff;
   --text-error: #ff6b6b;
   --text-notes: #aaa;
@@ -27,7 +27,7 @@
   --bg-cell-selected: #2563eb;  --bg-cell-highlight: #dce6f0;
   --bg-cell-same-number: #c5d5e8;
   --text-primary: #222;
-  --text-given: #555;
+  --text-given: #999;
   --text-entered: #333;
   --text-error: #d63031;
   --text-notes: #777;
