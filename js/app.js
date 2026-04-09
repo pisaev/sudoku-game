@@ -533,6 +533,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applyTheme(localStorage.getItem('sudoku-theme') || 'dark');
 
+  // Export / Import
+  document.getElementById('btn-export').addEventListener('click', () => {
+    const data = {
+      gameState: loadGameState(),
+      progress: loadProgress(),
+      theme: localStorage.getItem('sudoku-theme') || 'dark',
+      exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sudoku-save.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  const importFileEl = document.getElementById('import-file');
+  document.getElementById('btn-import').addEventListener('click', () => importFileEl.click());
+  importFileEl.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.progress) saveProgress(data.progress);
+        if (data.theme) applyTheme(data.theme);
+        if (data.gameState && data.gameState.puzzle) {
+          localStorage.setItem('sudoku-game-state', JSON.stringify(data.gameState));
+          const s = data.gameState;
+          puzzle = s.puzzle;
+          solution = s.solution;
+          current = s.current;
+          notes = s.notes.map(a => new Set(a));
+          timerSeconds = s.timerSeconds || 0;
+          gameComplete = s.gameComplete || false;
+          difficultyEl.value = s.difficulty || 'medium';
+          selected = -1;
+          noteMode = false;
+          history = [];
+          activeHint = null;
+          clearInterval(timerInterval);
+          timerInterval = setInterval(tick, 1000);
+          updateNoteButton();
+          render();
+          updateNumpadCompletion();
+        }
+      } catch { alert('Invalid save file'); }
+    };
+    reader.readAsText(file);
+    importFileEl.value = '';
+  });
+
   document.getElementById('btn-play-again').addEventListener('click', () => {
     modalOverlay.classList.remove('visible');
     newGame();

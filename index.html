@@ -14,6 +14,8 @@
   <header>
     <h1>SUDOKU</h1>
     <div class="header-controls">
+      <button id="btn-export" title="Export game">⬇</button>
+      <button id="btn-import" title="Import game">⬆</button>
       <button id="btn-learn" title="Learn techniques">📚</button>
       <button id="btn-stats" title="Your progress">📊</button>
       <button id="btn-tutorial" title="How to play">?</button>
@@ -106,6 +108,8 @@
       </div>
     </div>
   </div>
+
+  <input type="file" id="import-file" accept=".json" style="display:none">
 
   <script src="js/sudoku.js"></script>
   <script src="js/solver-techniques.js"></script>
