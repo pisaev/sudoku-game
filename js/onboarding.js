@@ -107,21 +107,13 @@ const Onboarding = (() => {
     if (step.position === 'near-cell' && step.guidedCell !== undefined) {
       const board = document.getElementById('board');
       const cell = board.children[step.guidedCell];
-      const numpad = document.querySelector('.numpad');
-      if (cell && numpad) {
+      if (cell) {
         const cellRect = cell.getBoundingClientRect();
-        const boardRect = board.getBoundingClientRect();
-        const numpadRect = numpad.getBoundingClientRect();
-        const cellMidY = cellRect.top + cellRect.height / 2;
-        const boardMidY = boardRect.top + boardRect.height / 2;
-
+        const tooltipHeight = tooltip.offsetHeight || 150;
+        let top = cellRect.top - tooltipHeight - 8;
+        if (top < 4) top = 4;
         tooltip.style.transform = 'translateX(-50%)';
-        if (cellMidY < boardMidY) {
-          const gap = numpadRect.top - boardRect.bottom;
-          tooltip.style.top = (boardRect.bottom + Math.max(4, gap / 2 - 60)) + 'px';
-        } else {
-          tooltip.style.top = Math.max(4, boardRect.top - tooltip.offsetHeight - 8) + 'px';
-        }
+        tooltip.style.top = top + 'px';
         return;
       }
     }
