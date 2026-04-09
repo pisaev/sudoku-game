@@ -72,9 +72,11 @@ const Onboarding = (() => {
         waitFor: 'number-enter'
       },
       {
-        text: '👍 Nice! You can use <strong>↩ Undo</strong> or <strong>⌫ Erase</strong> to fix mistakes. Now let\'s solve a few cells together!',
-        target: '#board',
-        position: 'below',
+        text: '👍 Nice! You can use <strong>↩ Undo</strong> or <strong>⌫ Erase</strong> to fix mistakes. Try them now, then tap <strong>Next</strong>!',
+        target: null,
+        position: 'near-cell',
+        guidedCell: 40,
+        noOverlay: true,
         nextLabel: "Let's solve!"
       }
     ];
@@ -188,7 +190,7 @@ const Onboarding = (() => {
 
     tooltip.classList.add('visible');
 
-    if (step.waitFor === 'guided-move') {
+    if (step.waitFor === 'guided-move' || step.noOverlay) {
       overlay.classList.remove('visible');
     } else {
       overlay.classList.add('visible');
