@@ -306,6 +306,23 @@ document.addEventListener('DOMContentLoaded', () => {
       modalTime.textContent = `${m}:${s}`;
       modalDifficulty.textContent = difficultyEl.value.charAt(0).toUpperCase() + difficultyEl.value.slice(1);
       modalOverlay.classList.add('visible');
+      return;
+    }
+
+    const isFull = current.every(v => v !== 0);
+    if (!isFull) return;
+
+    const wrongCells = [];
+    for (let i = 0; i < 81; i++) {
+      if (current[i] !== solution[i]) wrongCells.push(i);
+    }
+
+    if (wrongCells.length > 0) {
+      showMistakeWarning(`${wrongCells.length} cell${wrongCells.length > 1 ? 's are' : ' is'} incorrect — keep going!`);
+      wrongCells.forEach(i => {
+        const cell = boardEl.children[i];
+        if (cell) cell.classList.add('error');
+      });
     }
   }
 
