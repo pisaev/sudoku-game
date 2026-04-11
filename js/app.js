@@ -318,12 +318,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (wrongCells.length > 0) {
-      showMistakeWarning(`${wrongCells.length} cell${wrongCells.length > 1 ? 's are' : ' is'} incorrect — keep going!`);
+      showErrorChoice(wrongCells);
+    }
+  }
+
+  function showErrorChoice(wrongCells) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay visible';
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <h2>🤔 Not quite!</h2>
+      <p>${wrongCells.length} cell${wrongCells.length > 1 ? 's are' : ' is'} incorrect.</p>
+      <p>Would you like to see which ones?</p>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="err-show" style="padding:10px 20px;background:var(--btn-active);color:#fff;border:none;border-radius:8px;cursor:pointer">Show errors</button>
+        <button id="err-self" style="padding:10px 20px;background:var(--btn-bg);color:var(--text-primary);border:1px solid var(--border-thin);border-radius:8px;cursor:pointer">I'll find them</button>
+      </div>`;
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    modal.querySelector('#err-show').addEventListener('click', () => {
+      overlay.remove();
       wrongCells.forEach(i => {
         const cell = boardEl.children[i];
         if (cell) cell.classList.add('error');
       });
-    }
+    });
+    modal.querySelector('#err-self').addEventListener('click', () => {
+      overlay.remove();
+    });
   }
 
   document.addEventListener('keydown', (e) => {
