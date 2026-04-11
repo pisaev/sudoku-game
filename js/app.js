@@ -350,6 +350,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function checkBoard() {
+    if (gameComplete) return;
+    const wrongCells = [];
+    for (let i = 0; i < 81; i++) {
+      if (current[i] !== 0 && current[i] !== solution[i]) wrongCells.push(i);
+    }
+    if (wrongCells.length === 0) {
+      showMistakeWarning('✓ All placed numbers are correct!');
+    } else {
+      showErrorChoice(wrongCells);
+    }
+  }
+
   document.addEventListener('keydown', (e) => {
     if (gameComplete) return;
 
@@ -378,6 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-erase').addEventListener('click', erase);
   document.getElementById('btn-notes').addEventListener('click', toggleNoteMode);
   document.getElementById('btn-hint').addEventListener('click', showHint);
+  document.getElementById('btn-check').addEventListener('click', checkBoard);
   document.getElementById('hint-apply').addEventListener('click', applyHint);
   document.getElementById('hint-dismiss').addEventListener('click', () => { dismissHint(); render(); });
   document.getElementById('btn-new').addEventListener('click', newGame);
