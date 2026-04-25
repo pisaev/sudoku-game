@@ -276,6 +276,11 @@ header h1 {
   font-weight: 400;
 }
 
+.cell.selected .notes span {
+  color: #fff;
+  font-weight: 600;
+}
+
 .controls {
   width: 100%;
   max-width: 500px;
