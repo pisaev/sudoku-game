@@ -48,26 +48,74 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function saveGameState() {
+    if (gameComplete) return;
+    const diff = difficultyEl.value;
     const state = {
       puzzle, solution, current, timerSeconds, gameComplete,
-      difficulty: difficultyEl.value,
+      difficulty: diff,
       notes: notes.map(s => [...s])
     };
-    localStorage.setItem('sudoku-game-state', JSON.stringify(state));
+    const all = loadAllGameStates();
+    all[diff] = state;
+    localStorage.setItem('sudoku-game-states', JSON.stringify(all));
   }
 
-  function loadGameState() {
+  function loadAllGameStates() {
     try {
-      const raw = localStorage.getItem('sudoku-game-state');
-      if (!raw) return null;
-      const state = JSON.parse(raw);
-      if (!state.puzzle || !state.solution || !state.current) return null;
-      return state;
-    } catch { return null; }
+      const raw = localStorage.getItem('sudoku-game-states');
+      if (raw) return JSON.parse(raw) || {};
+    } catch {}
+    // Migrate legacy single-slot save
+    try {
+      const legacy = localStorage.getItem('sudoku-game-state');
+      if (legacy) {
+        const s = JSON.parse(legacy);
+        if (s && s.puzzle && s.difficulty) {
+          const all = { [s.difficulty]: s };
+          localStorage.setItem('sudoku-game-states', JSON.stringify(all));
+          localStorage.removeItem('sudoku-game-state');
+          return all;
+        }
+      }
+    } catch {}
+    return {};
   }
 
-  function clearGameState() {
-    localStorage.removeItem('sudoku-game-state');
+  function loadGameState(diff) {
+    const all = loadAllGameStates();
+    const state = all[diff || difficultyEl.value];
+    if (!state || !state.puzzle || !state.solution || !state.current) return null;
+    return state;
+  }
+
+  function clearGameState(diff) {
+    const target = diff || difficultyEl.value;
+    const all = loadAllGameStates();
+    if (target in all) {
+      delete all[target];
+      localStorage.setItem('sudoku-game-states', JSON.stringify(all));
+    }
+  }
+
+  function restoreFromState(s) {
+    puzzle = s.puzzle;
+    solution = s.solution;
+    current = s.current;
+    notes = s.notes.map(a => new Set(a));
+    timerSeconds = s.timerSeconds || 0;
+    gameComplete = s.gameComplete || false;
+    selected = -1;
+    noteMode = false;
+    history = [];
+    activeHint = null;
+    clearInterval(timerInterval);
+    if (!gameComplete) timerInterval = setInterval(tick, 1000);
+    const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+    const sec = String(timerSeconds % 60).padStart(2, '0');
+    timerEl.textContent = `${m}:${sec}`;
+    updateNoteButton();
+    render();
+    updateNumpadCompletion();
   }
 
   function newGame() {
@@ -92,7 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (autoNotesEnabled) fillAutoNotes();
     render();
     updateNumpadCompletion();
-    clearGameState();
+    clearGameState(diff);
+    saveGameState();
   }
 
   function tick() {
@@ -404,7 +453,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('chk-check-moves').addEventListener('change', (e) => {
     checkMovesEnabled = e.target.checked;
   });
-  difficultyEl.addEventListener('change', newGame);
+  difficultyEl.addEventListener('change', () => {
+    const saved = loadGameState();
+    if (saved && !saved.gameComplete) {
+      restoreFromState(saved);
+    } else {
+      newGame();
+    }
+  });
 
   // Tutorial
   const tutorialSteps = [
@@ -623,24 +679,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.progress) saveProgress(data.progress);
         if (data.theme) applyTheme(data.theme);
         if (data.gameState && data.gameState.puzzle) {
-          localStorage.setItem('sudoku-game-state', JSON.stringify(data.gameState));
           const s = data.gameState;
-          puzzle = s.puzzle;
-          solution = s.solution;
-          current = s.current;
-          notes = s.notes.map(a => new Set(a));
-          timerSeconds = s.timerSeconds || 0;
-          gameComplete = s.gameComplete || false;
           difficultyEl.value = s.difficulty || 'medium';
-          selected = -1;
-          noteMode = false;
-          history = [];
-          activeHint = null;
-          clearInterval(timerInterval);
-          timerInterval = setInterval(tick, 1000);
-          updateNoteButton();
-          render();
-          updateNumpadCompletion();
+          const all = loadAllGameStates();
+          all[difficultyEl.value] = s;
+          localStorage.setItem('sudoku-game-states', JSON.stringify(all));
+          restoreFromState(s);
         }
       } catch { alert('Invalid save file'); }
     };
@@ -654,31 +698,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Restore saved game or start new
-  const saved = loadGameState();
   if (Onboarding.shouldShow()) {
     difficultyEl.value = 'beginner';
     checkMovesEnabled = true;
     document.getElementById('chk-check-moves').checked = true;
     newGame();
     setTimeout(() => Onboarding.start(), 500);
-  } else if (saved && !saved.gameComplete) {
-    puzzle = saved.puzzle;
-    solution = saved.solution;
-    current = saved.current;
-    notes = saved.notes.map(a => new Set(a));
-    timerSeconds = saved.timerSeconds || 0;
-    gameComplete = false;
-    difficultyEl.value = saved.difficulty || 'medium';
-    selected = -1;
-    noteMode = false;
-    history = [];
-    activeHint = null;
-    clearInterval(timerInterval);
-    timerInterval = setInterval(tick, 1000);
-    updateNoteButton();
-    render();
-    updateNumpadCompletion();
   } else {
-    newGame();
+    // Pick the most recently saved difficulty if any has an in-progress game
+    const all = loadAllGameStates();
+    const inProgress = Object.values(all).filter(s => s && !s.gameComplete);
+    if (inProgress.length > 0) {
+      // Prefer the saved game matching the current dropdown; otherwise the first available
+      const preferred = all[difficultyEl.value] && !all[difficultyEl.value].gameComplete
+        ? all[difficultyEl.value]
+        : inProgress[0];
+      difficultyEl.value = preferred.difficulty;
+      restoreFromState(preferred);
+    } else {
+      newGame();
+    }
   }
 });
