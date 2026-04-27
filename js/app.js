@@ -50,13 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveGameState() {
     if (gameComplete) return;
     const diff = difficultyEl.value;
-    const state = {
-      puzzle, solution, current, timerSeconds, gameComplete,
-      difficulty: diff,
-      notes: notes.map(s => [...s])
-    };
-    const all = loadAllGameStates();
-    all[diff] = state;
+    const state = GameStorage.buildState({
+      puzzle, solution, current, notes, timerSeconds, gameComplete, difficulty: diff
+    });
+    const all = GameStorage.setSlot(loadAllGameStates(), state);
     localStorage.setItem('sudoku-game-states', JSON.stringify(all));
   }
 
@@ -69,12 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const legacy = localStorage.getItem('sudoku-game-state');
       if (legacy) {
-        const s = JSON.parse(legacy);
-        if (s && s.puzzle && s.difficulty) {
-          const all = { [s.difficulty]: s };
-          localStorage.setItem('sudoku-game-states', JSON.stringify(all));
+        const migrated = GameStorage.migrateLegacy(JSON.parse(legacy));
+        if (migrated) {
+          localStorage.setItem('sudoku-game-states', JSON.stringify(migrated));
           localStorage.removeItem('sudoku-game-state');
-          return all;
+          return migrated;
         }
       }
     } catch {}
@@ -82,19 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadGameState(diff) {
-    const all = loadAllGameStates();
-    const state = all[diff || difficultyEl.value];
-    if (!state || !state.puzzle || !state.solution || !state.current) return null;
-    return state;
+    return GameStorage.getSlot(loadAllGameStates(), diff || difficultyEl.value);
   }
 
   function clearGameState(diff) {
     const target = diff || difficultyEl.value;
-    const all = loadAllGameStates();
-    if (target in all) {
-      delete all[target];
-      localStorage.setItem('sudoku-game-states', JSON.stringify(all));
-    }
+    const next = GameStorage.removeSlot(loadAllGameStates(), target);
+    localStorage.setItem('sudoku-game-states', JSON.stringify(next));
   }
 
   function restoreFromState(s) {
@@ -681,8 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.gameState && data.gameState.puzzle) {
           const s = data.gameState;
           difficultyEl.value = s.difficulty || 'medium';
-          const all = loadAllGameStates();
-          all[difficultyEl.value] = s;
+          const all = GameStorage.setSlot(loadAllGameStates(), { ...s, difficulty: difficultyEl.value });
           localStorage.setItem('sudoku-game-states', JSON.stringify(all));
           restoreFromState(s);
         }
@@ -705,16 +694,12 @@ document.addEventListener('DOMContentLoaded', () => {
     newGame();
     setTimeout(() => Onboarding.start(), 500);
   } else {
-    // Pick the most recently saved difficulty if any has an in-progress game
+    // Pick the most appropriate saved game for the current dropdown
     const all = loadAllGameStates();
-    const inProgress = Object.values(all).filter(s => s && !s.gameComplete);
-    if (inProgress.length > 0) {
-      // Prefer the saved game matching the current dropdown; otherwise the first available
-      const preferred = all[difficultyEl.value] && !all[difficultyEl.value].gameComplete
-        ? all[difficultyEl.value]
-        : inProgress[0];
-      difficultyEl.value = preferred.difficulty;
-      restoreFromState(preferred);
+    const restore = GameStorage.selectSavedGame(all, difficultyEl.value);
+    if (restore) {
+      difficultyEl.value = restore.difficulty;
+      restoreFromState(restore);
     } else {
       newGame();
     }
